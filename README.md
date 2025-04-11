@@ -18,7 +18,7 @@ L'application est construite sur une architecture conteneurisée complète avec 
 ## Démonstration
 
 ### Version vidéo
-![Démonstration de l'application](./video.mp4)
+![Démonstration de l'application](video.mp4)
 ## Structure technique
 
 ### Architecture
