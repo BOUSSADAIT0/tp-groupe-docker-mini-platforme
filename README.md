@@ -73,10 +73,9 @@ Service qui sert de point d'entrée unique pour toute l'application. Il redirige
 
 ## Liens vers les images Docker Hub
 
-- Frontend: [node:18-alpine](https://hub.docker.com/_/node) (build) et [nginx:alpine](https://hub.docker.com/_/nginx) (runtime)
-- Backend: [node:18-alpine](https://hub.docker.com/_/node)
-- Base de données: [mongo:6](https://hub.docker.com/_/mongo)
-- Reverse Proxy: [nginx:alpine](https://hub.docker.com/_/nginx)
+- Frontend: boussad1ait/tp-groupe-docker-mini-platforme-frontend	
+- Backend: boussad1ait/tp-groupe-docker-mini-platforme-backend	
+- Reverse Proxy: boussad1ait/nginx
 
 ## Prérequis
 
