@@ -2,7 +2,10 @@
 
 ## Présentation du projet
 
-Cette application est une mini-plateforme permettant de découvrir des recettes chinoises. Le concept principal est de présenter aux utilisateurs une collection de plats chinois. Si un utilisateur reconnaît un plat et connaît sa recette, il peut la partager en utilisant un formulaire intégré.
+Cette application est une mini-plateforme permettant de découvrir des recettes chinoises. Le concept principal est de présenter aux utilisateurs une collection de plats chinois.
+![Démonstration de l'application](./cap1.png)
+ Si un utilisateur reconnaît un plat et connaît sa recette, il peut la partager en utilisant un formulaire intégré.
+![Démonstration de l'application](./cap2.png)
 
 L'application est construite sur une architecture conteneurisée complète avec Docker Compose, comprenant:
 - Un frontend React pour l'interface utilisateur
