@@ -10,11 +10,19 @@ const recipesRoutes = require('./routes/recipes');
 // Configuration
 dotenv.config();
 const app = express();
-const PORT = process.env.BACKEND_PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/recipes';
+const PORT = 5000 ;
 
 // Middlewares
-app.use(cors());
+// Configurez CORS plus précisément
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'http://frontend:80',
+    'http://localhost:5000'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // Logging
@@ -33,16 +41,17 @@ app.get('/', (req, res) => {
 });
 
 // Connexion à MongoDB
-mongoose.connect(MONGO_URI)
-  .then(() => {
-    console.log('Connecté à MongoDB');
-    // Lors du démarrage du serveur, vérifier et importer des recettes si nécessaire
-    // Cette partie sera gérée par la route GET /api/recipes
-  })
-  .catch(err => {
-    console.error('Erreur de connexion à MongoDB:', err.message);
-    process.exit(1);
-  });
+
+const connectWithRetry = () => {
+  mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log('Connecté à MongoDB'))
+    .catch(err => {
+      console.error('Erreur de connexion, nouvelle tentative dans 5s...', err);
+      setTimeout(connectWithRetry, 5000);
+    });
+};
+
+connectWithRetry();
 
 // Démarrage du serveur
 app.listen(PORT, () => {

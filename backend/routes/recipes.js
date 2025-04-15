@@ -24,99 +24,56 @@ const Recipe = mongoose.model('Recipe', recipeSchema);
 // GET - Liste de toutes les recettes (locales + TheMealDB)
 router.get('/', async (req, res) => {
   try {
-    // Récupérer les recettes locales de notre base de données
-    const localRecipes = await Recipe.find().sort({ createdAt: -1 });
+    // D'abord vérifier si la collection est vide (approche plus fiable)
+    const count = await Recipe.countDocuments();
     
-    // Vérifier si on a déjà des recettes de TheMealDB dans notre base
-    const hasMealDbRecipes = await Recipe.findOne({ idMeal: { $exists: true } });
-    
-    // Si on n'a pas encore de recettes de TheMealDB, les récupérer et les sauvegarder
-    if (!hasMealDbRecipes) {
+    if (count === 0) {
+      console.log('Base vide, importation des recettes depuis TheMealDB...');
       try {
-        console.log('Récupération des recettes depuis TheMealDB...');
         const response = await axios.get('https://www.themealdb.com/api/json/v1/1/filter.php?a=Chinese');
         
-        if (response.data && response.data.meals) {
-          const mealDbRecipes = response.data.meals;
+        if (response.data?.meals) {
+          // Utiliser insertMany pour plus d'efficacité
+          await Recipe.insertMany(response.data.meals.map(meal => ({
+            idMeal: meal.idMeal,
+            strMeal: meal.strMeal,
+            strMealThumb: meal.strMealThumb,
+            createdAt: new Date() // Ajouter un timestamp
+          })));
           
-          // Sauvegarder les recettes dans notre base de données
-          for (const meal of mealDbRecipes) {
-            const exists = await Recipe.findOne({ idMeal: meal.idMeal });
-            
-            if (!exists) {
-              await Recipe.create({
-                idMeal: meal.idMeal,
-                strMeal: meal.strMeal,
-                strMealThumb: meal.strMealThumb
-              });
-            }
-          }
-          
-          console.log(`${mealDbRecipes.length} recettes importées depuis TheMealDB`);
+          console.log(`${response.data.meals.length} recettes importées`);
         }
       } catch (apiError) {
-        console.error('Erreur lors de la récupération depuis TheMealDB:', apiError.message);
+        console.error('Erreur API TheMealDB:', apiError.message);
       }
     }
-    
-    // Récupérer toutes les recettes (incluant celles qu'on vient d'ajouter)
+
+    // Maintenant récupérer toutes les recettes
     const allRecipes = await Recipe.find().sort({ createdAt: -1 });
-    
     res.json(allRecipes);
+    
   } catch (err) {
-    console.error('Erreur lors de la récupération des recettes:', err.message);
+    console.error('Erreur GET /:', err);
     res.status(500).json({ message: err.message });
   }
 });
-
-// POST - Ajouter une nouvelle recette (manuelle)
-router.post('/', async (req, res) => {
-  const recipe = new Recipe({
-    name: req.body.name,
-    ingredients: req.body.ingredients,
-    instructions: req.body.instructions,
-    prepTime: req.body.prepTime,
-    cookTime: req.body.cookTime
-  });
-
-  try {
-    const newRecipe = await recipe.save();
-    res.status(201).json(newRecipe);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
-
 // GET - Importer les recettes depuis TheMealDB
-router.get('/import', async (req, res) => {
+// POST - Initialiser la base avec des recettes par défaut
+router.post('/init', async (req, res) => {
   try {
+    await Recipe.deleteMany({}); // Nettoyer la base
+    
     const response = await axios.get('https://www.themealdb.com/api/json/v1/1/filter.php?a=Chinese');
+    const recipes = response.data.meals.map(meal => ({
+      idMeal: meal.idMeal,
+      strMeal: meal.strMeal,
+      strMealThumb: meal.strMealThumb,
+      createdAt: new Date()
+    }));
     
-    if (!response.data || !response.data.meals) {
-      return res.status(404).json({ message: 'Aucune recette trouvée sur TheMealDB' });
-    }
+    await Recipe.insertMany(recipes);
+    res.json({ message: `${recipes.length} recettes importées` });
     
-    const mealDbRecipes = response.data.meals;
-    let importCount = 0;
-    
-    // Sauvegarder les recettes dans notre base de données
-    for (const meal of mealDbRecipes) {
-      const exists = await Recipe.findOne({ idMeal: meal.idMeal });
-      
-      if (!exists) {
-        await Recipe.create({
-          idMeal: meal.idMeal,
-          strMeal: meal.strMeal,
-          strMealThumb: meal.strMealThumb
-        });
-        importCount++;
-      }
-    }
-    
-    res.json({ 
-      message: `${importCount} nouvelles recettes importées depuis TheMealDB`,
-      totalRecipes: mealDbRecipes.length
-    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
 import RecipeForm from './components/RecipeForm';
-import RecipeList from './components/RecipeList';
 import RecipeSlider from './components/RecipeSlider';
 
 function App() {
@@ -11,8 +10,8 @@ function App() {
   const [error, setError] = useState(null);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
 
-  // URL de l'API backend
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/recipes';
+  // // URL de l'API backend
+  const API_URL = process.env.REACT_APP_API_URL ;
 
   // Charger les recettes
   useEffect(() => {
@@ -22,12 +21,16 @@ function App() {
   const fetchRecipes = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(API_URL);
+      const response = await axios.get('/api/recipes', {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log('Données reçues:', response.data); // Debug
       setRecipes(response.data);
-      setError(null);
     } catch (err) {
+      console.error('Erreur complète:', err.response); // Affiche plus de détails
       setError('Erreur lors du chargement des recettes');
-      console.error('Erreur:', err);
     } finally {
       setLoading(false);
     }
