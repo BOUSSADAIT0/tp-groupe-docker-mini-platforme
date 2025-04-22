@@ -93,20 +93,62 @@ Service qui sert de point d'entrée unique pour toute l'application. Il redirige
    cd mini-plateforme
    ```
 
-2. **Configurez les variables d'environnement**
+2. **Créer un docker-compose.yml**
    
-   Créez un fichier `.env` à la racine du projet avec le contenu suivant:
+  
    ```
-   # Configuration des ports
-   NGINX_PORT=80
-   BACKEND_PORT=5000
+version: '3.8'
 
-   # Configuration MongoDB
-   MONGO_URI=mongodb://db:27017/recipes
-   MONGO_INITDB_DATABASE=recipes
+services:
+  # Frontend React
+  frontend:
+    image: akramch77/tp-groupe-docker-mini-platforme-frontend:1.0
+    container_name: mini-platform-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
 
-   # Configuration frontend
-   REACT_APP_API_URL=http://localhost/api/recipes
+  # Backend Node.js
+  backend:
+    image: akramch77/tp-groupe-docker-mini-platforme-backend:1.0
+    container_name: mini-platform-backend
+    restart: unless-stopped
+    environment:
+      - MONGO_URI=mongodb://db:27017/recipes
+      - PORT=5000
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  # Base de données MongoDB
+  db:
+    image: mongo:6
+    container_name: mini-platform-mongodb
+    restart: unless-stopped
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - app-network
+
+# Volumes nommés
+volumes:
+  mongodb_data:
+    name: mini-platform-mongodb-data
+
+# Réseau interne
+networks:
+  app-network:
+    driver: bridge
+
    ```
 
 3. **Lancez l'application avec Docker Compose**
