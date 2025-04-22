@@ -87,13 +87,7 @@ Service qui sert de point d'entrée unique pour toute l'application. Il redirige
 
 ## Installation et démarrage
 
-1. **Clonez le dépôt**
-   ```bash
-   git clone [URL_DU_REPO]
-   cd mini-plateforme
-   ```
-
-2. **Créer un docker-compose.yml**
+1. **Créer un docker-compose.yml**
    
 ```yaml
 version: '3.8'
@@ -149,12 +143,12 @@ networks:
     driver: bridge
 ```
 
-3. **Lancez l'application avec Docker Compose**
+2. **Lancez l'application avec Docker Compose**
    ```bash
    docker-compose up -d
    ```
 
-4. **Accédez à l'application**
+3. **Accédez à l'application**
    
    Ouvrez votre navigateur et accédez à `http://localhost`
 
