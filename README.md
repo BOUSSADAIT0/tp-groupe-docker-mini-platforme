@@ -100,7 +100,7 @@ Service qui sert de point d'entrée unique pour toute l'application. Il redirige
 version: '3.8'
 
 services:
-  # Frontend React
+  
   frontend:
     image: akramch77/tp-groupe-docker-mini-platforme-frontend:1.0
     container_name: mini-platform-frontend
@@ -112,7 +112,7 @@ services:
     networks:
       - app-network
 
-  # Backend Node.js
+ 
   backend:
     image: akramch77/tp-groupe-docker-mini-platforme-backend:1.0
     container_name: mini-platform-backend
@@ -127,7 +127,7 @@ services:
     networks:
       - app-network
 
-  # Base de données MongoDB
+  
   db:
     image: mongo:6
     container_name: mini-platform-mongodb
@@ -139,12 +139,12 @@ services:
     networks:
       - app-network
 
-# Volumes nommés
+
 volumes:
   mongodb_data:
     name: mini-platform-mongodb-data
 
-# Réseau interne
+
 networks:
   app-network:
     driver: bridge
