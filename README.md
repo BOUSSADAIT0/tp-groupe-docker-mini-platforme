@@ -95,8 +95,7 @@ Service qui sert de point d'entrée unique pour toute l'application. Il redirige
 
 2. **Créer un docker-compose.yml**
    
-  
-   ```
+```yaml
 version: '3.8'
 
 services:
@@ -148,8 +147,7 @@ volumes:
 networks:
   app-network:
     driver: bridge
-
-   ```
+```
 
 3. **Lancez l'application avec Docker Compose**
    ```bash
